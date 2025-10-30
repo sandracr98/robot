@@ -40,4 +40,5 @@ public record Grid(int maxX, int maxY){
         return p.x() >= 0 && p.y() >= 0 && p.x() <= maxX && p.y() <= maxY;
     }
 
+
 }
