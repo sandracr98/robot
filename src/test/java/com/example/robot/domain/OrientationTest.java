@@ -1,4 +1,4 @@
-package com.example.robot;
+package com.example.robot.domain;
 
 import com.example.robot.domain.Orientation;
 import org.junit.jupiter.api.Test;
