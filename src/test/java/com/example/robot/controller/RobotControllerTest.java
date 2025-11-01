@@ -2,10 +2,12 @@ package com.example.robot.controller;
 
 import com.example.robot.application.port.in.FinalState;
 import com.example.robot.application.port.in.ProcessScenarioUseCase;
+import com.example.robot.application.port.in.ScenarioCommand;
 import com.example.robot.application.port.in.ScenarioResult;
 import com.example.robot.infrastructure.controller.RobotController;
 import com.example.robot.infrastructure.dto.RobotProgramRequest;
 import com.example.robot.infrastructure.dto.ScenarioRequest;
+import com.example.robot.infrastructure.parserRaw.RawScenarioParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @WebMvcTest(controllers = RobotController.class)
 class RobotControllerTest {
@@ -60,4 +63,34 @@ class RobotControllerTest {
                 .andExpect(jsonPath("$.finals[1].y").value(1))
                 .andExpect(jsonPath("$.finals[1].orientation").value("E"));
     }
+
+    @Test
+    void parses_sample_ok() {
+        String raw = """
+                5 5
+                1 2 N
+                LMLMLMLMM
+                3 3 E
+                MMRMMRMRRM
+                """;
+        ScenarioCommand cmd = RawScenarioParser.parse(raw);
+        assertEquals(5, cmd.grid().maxX());
+        assertEquals(5, cmd.grid().maxY());
+        assertEquals(2, cmd.programs().size());
+        assertEquals(1, cmd.programs().get(0).startX());
+        assertEquals('N', cmd.programs().get(0).orientation());
+        assertEquals("LMLMLMLMM", cmd.programs().get(0).instructions());
+    }
+
+    @Test
+    void invalid_orientation_throws() {
+        String raw = """
+                5 5
+                1 2 X
+                MMM
+                """;
+        assertThrows(IllegalArgumentException.class, () -> RawScenarioParser.parse(raw));
+    }
+
+
 }
