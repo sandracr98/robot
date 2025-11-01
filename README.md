@@ -87,15 +87,15 @@ Principles applied:
 |--------|-------|
 Project setup | ✅ Done  
 Git branching strategy | ✅ develop + feature branches  
-Domain layer started | ✅  
+Domain layer started | ✅  Done
 Orientation enum | ✅ + tests + JavaDoc  
 Position value object | ✅ + tests + JavaDoc  
-Grid | ⬜ Next  
-Robot aggregate | ⬜ Pending  
-Application services | ⬜ Pending  
-REST adapters | ⬜ Pending  
-Parser for console input | ⬜ Pending  
-End-to-end tests | ⬜ Pending  
+Grid | ✅  Done
+Robot aggregate | ✅  Done
+Application services | ✅  Done
+REST adapters | ✅   Done
+Parser for console input | ✅ Done
+End-to-end tests | ✅ Done
 
 ---
 
@@ -127,13 +127,81 @@ End-to-end tests | ⬜ Pending
 
 ## 🧱 Proyect Structure
 
-src/
- ├── main/java/com/example/robot/domain
- │     ├── Orientation.java
- │     └── Position.java
- └── test/java/com/example/robot/domain
-       ├── OrientationTest.java
-       └── PositionTest.java
-README.md
+src/main/java/com/example/robot
+├── domain/ # Modelo puro de dominio (sin Spring)
+│ ├── Robot.java
+│ ├── Position.java
+│ ├── Orientation.java
+│ ├── Instruction.java
+│ ├── InstructionSequence.java
+│ ├── Grid.java
+│ ├── Navigator.java
+│ ├── OutOfBoundsPolicy.java
+│ └── exception/DomainException.java
+│
+├── application/ # Casos de uso (sin framework)
+│ ├── port/in/ProcessScenarioUseCase.java
+│ ├── port/in/command/.java
+│ ├── port/in/result/.java
+│ └── service/RobotScenarioService.java
+│
+└── infrastructure/ # Adaptadores (Spring)
+├── controller/RobotController.java
+├── controller/ApiExceptionHandler.java # Manejo global de errores
+├── parser/RawScenarioParser.java # Formato texto plano
+├── dto/*.java
+└── config/ApplicationWiring.java # Inyección de dependencias
 
+
+✅ Dominio sin dependencias  
+✅ Aplicación sin Spring  
+✅ Infraestructura como capa externa
+
+---
+
+## 🌐 REST API
+
+### 🔷 Ejecutar con JSON
+POST /api/v1/robots/execute
+Content-Type: application/json
+
+#### Body
+```json
+{
+  "maxX": 5,
+  "maxY": 5,
+  "programs": [
+    { "startX": 1, "startY": 2, "orientation": "N", "instructions": "LMLMLMLMM" },
+    { "startX": 3, "startY": 3, "orientation": "E", "instructions": "MMRMMRMRRM" }
+  ]
+}
+```
+### 🔷 Ejecutar con RAW
+POST /api/v1/robots/execute-raw
+Content-Type: text/plain
+#### Body
+5 5
+1 2 N
+LMLMLMLMM
+3 3 E
+MMRMMRMRRM
+
+### 🧪 Ejecutar Tests
+./mvnw test
+
+### ▶️ Ejecutar aplicación
+./mvnw spring-boot:run
+
+---
+## 🌟 Notes
+
+This project is intentionally designed for:
+
+practicing professional backend patterns
+
+gaining fluency in clean design & testing
+
+understanding DDD without over-engineering
+
+The code evolves iteratively, with a focus on clarity and correctness over speed.
 
