@@ -48,4 +48,11 @@ public class SetOccupancy implements Occupancy{
     public void occupy(Position position) {
         occupiedPositions.add(Objects.requireNonNull(position));
     }
+
+    @Override
+    public boolean allowMove(Position next, Position current) {
+        // A move is allowed if the next position is free
+        // If the next position is occupied, the move is blocked
+        return false;
+    }
 }

@@ -31,16 +31,22 @@ public final class RobotScenarioService implements ProcessScenarioUseCase {
         GridSize gridSize = command.grid();
         Grid grid = new Grid(gridSize.maxX(), gridSize.maxY());
 
+        Occupancy occupancy = new SetOccupancy();
+
         List<FinalState> finals = new ArrayList<>(command.programs().size());
 
-        // Robots se procesan SECUENCIALMENTE
+        // Process each robot program
+        // For each program, create a robot, apply the instructions, and record the final state
+        // Return the scenario result with all final states
         for (RobotProgram p : command.programs()) {
             Robot robot = new Robot(
                     new Position(p.startX(), p.startY()),
                     Orientation.fromChar(p.orientation()),
                     grid
             );
-            navigator.apply(robot, InstructionSequence.parse(p.instructions()));
+
+            navigator.apply(robot, InstructionSequence.parse(p.instructions()), occupancy, true);
+
             finals.add(new FinalState(
                     robot.position().x(),
                     robot.position().y(),

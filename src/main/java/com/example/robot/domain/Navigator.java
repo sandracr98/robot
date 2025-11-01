@@ -67,8 +67,11 @@ public final class Navigator {
                     // Check occupancy if provided
                     // Skip move if the next position is occupied
                     if (occupancy != null && !occupancy.isFree(next)) {
-                        // position occupied, skip move
-                        continue;
+                        // position occupied, check if move is allowed
+                        // if not allowed, skip the move
+                        if (!occupancy.allowMove(next, robot.position())) {
+                            continue;
+                        }
                     }
 
                     // Move the robot to the next position
