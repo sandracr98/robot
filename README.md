@@ -1,10 +1,44 @@
 # 🤖 Robot Navigation – Hexagonal Architecture & DDD
 
+---
+
+## 👩‍💻 Author
+
+Sandra Checa Ruiz  
+Software Developer
+
+
 This project implements a robot navigation system using **Domain-Driven Design (DDD)** and **Hexagonal Architecture (Ports & Adapters)**, built with **Java 21** and **Spring Boot 3**.
 
 The goal is to simulate the movement of cleaning robots on a grid, allowing them to turn and advance according to instructions. Each robot operates sequentially within the same map.
 
 This repository is used as a **learning and clean-architecture practice project**, with code structured in layers and developed following professional Git and testing practices.
+
+
+
+### Assumptions
+
+- Robots execute sequentially, not simultaneously.
+- If a robot attempts to move out of bounds, the movement is ignored.
+- Collision policy: robots cannot occupy the same position. Attempts to move into an occupied cell are ignored.
+- Input format follows the classic Mars Rover kata structure (grid + robot + instructions).
+
+
+### 🧠 Why a Rich Domain Model?
+
+This project uses a rich domain model rather than an anemic one.
+
+| Benefit | Description |
+|--------|-------------|
+Business logic close to data | Robot, Position and Orientation encapsulate their own behavior |
+Explicit domain language | Concepts like Grid, Occupancy, InstructionSequence reflect the problem space |
+Robust and consistent rules | Movement logic, bounds checking and collision handling happen in the domain |
+Easier evolution | New rules (e.g. “throw on collision”, different boundary policies) can be added without touching controllers |
+Better testability | Domain is framework-free and unit tested in isolation |
+Framework independent | Spring lives in infrastructure — domain remains pure and portable |
+
+This ensures strong cohesion and clear separation of concerns:  
+**the domain drives the software — not the framework.**
 
 ---
 
@@ -68,6 +102,40 @@ Principles applied:
 - TDD where reasonable
 - One feature per branch
 
+---
+
+## 🧠 Why a Rich Domain Model?
+
+This project intentionally uses a **rich domain model** instead of an anemic one.
+
+### ✅ What does that mean?
+
+- The **business rules live inside the domain objects**
+- Entities and Value Objects have **behavior**, not just data
+- Domain logic is **not** pushed to controllers or services
+
+### 🧩 Benefits
+
+| Benefit | Explanation |
+|--------|------------|
+Strong business consistency | Rules and constraints always apply because the domain enforces them |
+High cohesion | Each domain object knows how to manage its own logic |
+Low coupling | The domain does not depend on Spring or infrastructure |
+Better testability | Pure domain tests run fast and independently |
+Expressive code | Concepts like `Robot`, `Position`, `Grid`, `InstructionSequence` match the real problem |
+Easier to evolve | Adding new rules (e.g. collision policies) doesn't break controllers or services |
+Avoids "God services" | Logic is distributed in the right domain objects, not in giant service classes |
+
+### 🎯 Result
+
+The code is easier to understand, modify, and extend.  
+Business rules are clear and centralized in the domain layer, making the system:
+
+- more maintainable
+- more robust
+- more aligned with real-world behavior
+
+In short: **the domain drives the system — not the framework**.
 ---
 
 ## 📦 Tech Stack
