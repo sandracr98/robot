@@ -20,25 +20,34 @@ This repository is used as a **learning and clean-architecture practice project*
 
 - Robots execute sequentially, not simultaneously.
 - If a robot attempts to move out of bounds, the movement is ignored.
-- Collision policy: robots cannot occupy the same position. Attempts to move into an occupied cell are ignored.
-- Input format follows the classic Mars Rover kata structure (grid + robot + instructions).
+- Collision policy (extra funcionality): robots cannot occupy the same position. Attempts to move into an occupied cell are detects this potential collision and treats the cell as an obstacle.
+  In such cases, the movement for that step is ignored. This prevents overlapping positions and ensures consistent simulation behavior.
+
+---
 
 
-### 🧠 Why a Rich Domain Model?
+### 🔄 Git History Notes
 
-This project uses a rich domain model rather than an anemic one.
+During development, the project followed a GitFlow-style branching model.
+All features were developed in dedicated feature/* branches and merged into develop before being promoted to main.
 
-| Benefit                      | Description                                                                                                  |
-|------------------------------|--------------------------------------------------------------------------------------------------------------|
-| Business logic close to data | Robot, Position and Orientation encapsulate their own behavior                                               |
-| Explicit domain language     | Concepts like Grid, Occupancy, InstructionSequence reflect the problem space                                 |
-| Robust and consistent rules  | Movement logic, bounds checking and collision handling happen in the domain                                  |
-| Easier evolution             | New rules (e.g. “throw on collision”, different boundary policies) can be added without touching controllers |
-| Better testability           | Domain is framework-free and unit tested in isolation                                                        |
-| Framework independent        | Spring lives in infrastructure — domain remains pure and portable                                            |
+In one of the early iterations, a feature branch was accidentally merged directly into main instead of develop.
+Although this was quickly detected and corrected, the commit remains visible in the graph.
 
-This ensures strong cohesion and clear separation of concerns:  
-**the domain drives the software — not the framework.**
+Instead of rewriting Git history (which is discouraged in collaborative environments), the fix was handled safely:
+
+The feature was also merged into develop to keep branches consistent.
+
+Development continued normally from develop.
+
+The workflow was reinforced to avoid direct merges into main.
+
+| Branch      | Purpose                       |
+| ----------- | ----------------------------- |
+| `main`      | stable release branch         |
+| `develop`   | integration branch            |
+| `feature/*` | isolated development branches |
+
 
 ---
 
@@ -149,24 +158,6 @@ In short: **the domain drives the system — not the framework**.
 
 ---
 
-## ✅ Progress
-
-| Feature                  | Status                       |
-|--------------------------|------------------------------|
-| Project setup            | ✅ Done                       |
-| Git branching strategy   | ✅ develop + feature branches |
-| Domain layer started     | ✅  Done                      |
-| Orientation enum         | ✅ + tests + JavaDoc          |
-| Position value object    | ✅ + tests + JavaDoc          |
-| Grid                     | ✅  Done                      |
-| Robot aggregate          | ✅  Done                      |
-| Application services     | ✅  Done                      |
-| REST adapters            | ✅   Done                     |
-| Parser for console input | ✅ Done                       |
-| End-to-end tests         | ✅ Done                       |
-
----
-
 ## 🧩 Domain Model Components
 
 ### ✔️ `Orientation`
@@ -219,42 +210,6 @@ In short: **the domain drives the system — not the framework**.
 - Prevents two robots sharing a tile
 - Fully unit tested
 ---
-## Domain relationship Diagram
-
-┌────────────┐        ┌──────────────┐
-│  Grid      │        │ Orientation  │
-└─────┬──────┘        └──────┬───────┘
-│ inside()              │ dx, dy
-│                       │ turnLeft/right
-▼                       ▼
-┌────────────┐        ┌──────────────┐
-│ Position   │◄───────┤ Instruction  │
-└────┬───────┘        └──────────────┘
-│ next(pos, ori)       ▲
-│                      │ parse
-▼                      │
-┌────────────┐        ┌──────────────┐
-│  Robot     │◄───────┤ InstructionSeq
-└────┬───────┘        └──────────────┘
-│ move/peek/turn
-▼
-┌────────────┐
-│ Navigator  │───> applies policies
-└────┬───────┘
-│ uses
-▼
-┌──────────────┐  ┌────────────────┐
-│OutOfBoundsPol│  │CollisionPolicy │
-└──────────────┘  └────────────────┘
-▲                 ▲
-│                 │
-Ignore / Throw     Wait / Ignore / Throw
-
-┌──────────────┐
-│  Occupancy   │ keeps visited positions
-└──────────────┘
-
----
 
 ## 🧪 Testing Strategy
 
@@ -262,45 +217,48 @@ Ignore / Throw     Wait / Ignore / Throw
 - Unit tests first for domain objects
 - Meaningful test naming and assertions
 - JavaDoc in tests to clarify intent
-- Defensive programming (null checks, value semantics)
-
-
-## 🧱 Proyect Structure
-
-src/main/java/com/example/robot
-├── domain/ # Domain model (No spring dependencies)
-│ ├── Robot.java
-│ ├── Position.java
-│ ├── Orientation.java
-│ ├── Instruction.java
-│ ├── InstructionSequence.java
-│ ├── Grid.java
-│ ├── Navigator.java
-│ ├── OutOfBoundsPolicy.java
-│ └── exception/DomainException.java
-│
-├── application/ # Use cases (No framework)
-│ ├── port/in/ProcessScenarioUseCase.java
-│ ├── port/in/command/.java
-│ ├── port/in/result/.java
-│ └── service/RobotScenarioService.java
-│
-└── infrastructure/ # Adapters (Spring, REST, Parsing)
-├── controller/RobotController.java
-├── controller/ApiExceptionHandler.java # Global error handling
-├── parser/RawScenarioParser.java # Plain text input parser
-├── dto/*.java
-└── config/ApplicationWiring.java # Dependency injection
-
-
-✅ No dependencies from domain/application to Spring 
-✅ Infrastructure depends on domain/application
 
 ---
 
-## 🌐 REST API
+## 🚀 Testing the Application with Postman
 
-### 🔷 Ejecutar con JSON
+This project exposes REST endpoints to simulate robot navigation.
+Below are instructions to test the application using Postman.
+
+✅ Supports JSON requests
+
+✅ Supports RAW text input (as in the original challenge)
+
+### 🛠️ Setup
+
+1️⃣ Start the Application
+
+    ./mvnw spring-boot:run
+
+
+By default the server runs at:
+
+    http://localhost:8080
+
+2️⃣ Open Postman
+
+3️⃣ Create a new POST request
+
+#### 🔷 Ejecutar con RAW
+POST /api/v1/robots/execute-raw-plain
+
+Content-Type: text/plain
+#### Body
+```json
+  5 5
+  1 2 N
+  LMLMLMLMM
+  3 3 E
+  MMRMMRMRRM
+```
+
+
+#### 🔷 Ejecutar con JSON
 POST /api/v1/robots/execute
 Content-Type: application/json
 
@@ -315,38 +273,24 @@ Content-Type: application/json
   ]
 }
 ```
-### 🔷 Ejecutar con RAW
-POST /api/v1/robots/execute-raw
-
-Content-Type: text/plain
-#### Body
-5 5
-
-1 2 N
-
-LMLMLMLMM
-
-3 3 E
-
-MMRMMRMRRM
 
 
 ### 🧪 Ejecutar Tests
-./mvnw test
+    ./mvnw test
 
-### ▶️ Ejecutar aplicación
-./mvnw spring-boot:run
 
 ---
 ## 🌟 Notes
 
 This project is intentionally designed for:
 
-practicing professional backend patterns
+- Passing the Volkswagen technical interview.
 
-gaining fluency in clean design & testing
+- Practicing professional backend patterns
 
-understanding DDD without over-engineering
+- Gaining fluency in clean design & testing
 
-The code evolves iteratively, with a focus on clarity and correctness over speed.
+- Understanding DDD without over-engineering
+
+- The code evolves iteratively, with a focus on clarity and correctness over speed.
 
