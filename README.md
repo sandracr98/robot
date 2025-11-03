@@ -28,14 +28,14 @@ This repository is used as a **learning and clean-architecture practice project*
 
 This project uses a rich domain model rather than an anemic one.
 
-| Benefit | Description |
-|--------|-------------|
-Business logic close to data | Robot, Position and Orientation encapsulate their own behavior |
-Explicit domain language | Concepts like Grid, Occupancy, InstructionSequence reflect the problem space |
-Robust and consistent rules | Movement logic, bounds checking and collision handling happen in the domain |
-Easier evolution | New rules (e.g. “throw on collision”, different boundary policies) can be added without touching controllers |
-Better testability | Domain is framework-free and unit tested in isolation |
-Framework independent | Spring lives in infrastructure — domain remains pure and portable |
+| Benefit                      | Description                                                                                                  |
+|------------------------------|--------------------------------------------------------------------------------------------------------------|
+| Business logic close to data | Robot, Position and Orientation encapsulate their own behavior                                               |
+| Explicit domain language     | Concepts like Grid, Occupancy, InstructionSequence reflect the problem space                                 |
+| Robust and consistent rules  | Movement logic, bounds checking and collision handling happen in the domain                                  |
+| Easier evolution             | New rules (e.g. “throw on collision”, different boundary policies) can be added without touching controllers |
+| Better testability           | Domain is framework-free and unit tested in isolation                                                        |
+| Framework independent        | Spring lives in infrastructure — domain remains pure and portable                                            |
 
 This ensures strong cohesion and clear separation of concerns:  
 **the domain drives the software — not the framework.**
@@ -46,11 +46,11 @@ This ensures strong cohesion and clear separation of concerns:
 
 The robot receives commands:
 
-| Command | Meaning |
-|--------|---------|
-| `L` | Rotate 90° left |
-| `R` | Rotate 90° right |
-| `M` | Move forward one position |
+| Command | Meaning                   |
+|---------|---------------------------|
+| `L`     | Rotate 90° left           |
+| `R`     | Rotate 90° right          |
+| `M`     | Move forward one position |
 
 Grid example:
 
@@ -88,11 +88,11 @@ application/
 infrastructure/
 
 
-| Layer | Responsibility |
-|------|----------------|
-Domain | Business rules, aggregates, value objects |
-Application | Use cases / orchestration |
-Infrastructure | Adapters (web, persistence, input parsing) |
+| Layer          | Responsibility                             |
+|----------------|--------------------------------------------|
+| Domain         | Business rules, aggregates, value objects  |
+| Application    | Use cases / orchestration                  |
+| Infrastructure | Adapters (web, persistence, input parsing) |
 
 Principles applied:
 
@@ -116,15 +116,15 @@ This project intentionally uses a **rich domain model** instead of an anemic one
 
 ### 🧩 Benefits
 
-| Benefit | Explanation |
-|--------|------------|
-Strong business consistency | Rules and constraints always apply because the domain enforces them |
-High cohesion | Each domain object knows how to manage its own logic |
-Low coupling | The domain does not depend on Spring or infrastructure |
-Better testability | Pure domain tests run fast and independently |
-Expressive code | Concepts like `Robot`, `Position`, `Grid`, `InstructionSequence` match the real problem |
-Easier to evolve | Adding new rules (e.g. collision policies) doesn't break controllers or services |
-Avoids "God services" | Logic is distributed in the right domain objects, not in giant service classes |
+| Benefit                     | Explanation                                                                             |
+|-----------------------------|-----------------------------------------------------------------------------------------|
+| Strong business consistency | Rules and constraints always apply because the domain enforces them                     |
+| High cohesion               | Each domain object knows how to manage its own logic                                    |
+| Low coupling                | The domain does not depend on Spring or infrastructure                                  |
+| Better testability          | Pure domain tests run fast and independently                                            |
+| Expressive code             | Concepts like `Robot`, `Position`, `Grid`, `InstructionSequence` match the real problem |
+| Easier to evolve            | Adding new rules (e.g. collision policies) doesn't break controllers or services        |
+| Avoids "God services"       | Logic is distributed in the right domain objects, not in giant service classes          |
 
 ### 🎯 Result
 
@@ -151,23 +151,23 @@ In short: **the domain drives the system — not the framework**.
 
 ## ✅ Progress
 
-| Feature | Status |
-|--------|-------|
-Project setup | ✅ Done  
-Git branching strategy | ✅ develop + feature branches  
-Domain layer started | ✅  Done
-Orientation enum | ✅ + tests + JavaDoc  
-Position value object | ✅ + tests + JavaDoc  
-Grid | ✅  Done
-Robot aggregate | ✅  Done
-Application services | ✅  Done
-REST adapters | ✅   Done
-Parser for console input | ✅ Done
-End-to-end tests | ✅ Done
+| Feature                  | Status                       |
+|--------------------------|------------------------------|
+| Project setup            | ✅ Done                       |
+| Git branching strategy   | ✅ develop + feature branches |
+| Domain layer started     | ✅  Done                      |
+| Orientation enum         | ✅ + tests + JavaDoc          |
+| Position value object    | ✅ + tests + JavaDoc          |
+| Grid                     | ✅  Done                      |
+| Robot aggregate          | ✅  Done                      |
+| Application services     | ✅  Done                      |
+| REST adapters            | ✅   Done                     |
+| Parser for console input | ✅ Done                       |
+| End-to-end tests         | ✅ Done                       |
 
 ---
 
-## 🧩 Domain Model Components (so far)
+## 🧩 Domain Model Components
 
 ### ✔️ `Orientation`
 - Represents robot facing direction
@@ -181,6 +181,78 @@ End-to-end tests | ✅ Done
 - Moves according to orientation
 - No boundary logic (handled by `Grid`)
 - Fully unit tested
+### ✔️ `Grid`
+- Defines grid size and boundaries
+- Checks if positions are within bounds
+- Tracks occupied positions
+- Fully unit tested
+### ✔️ `Robot`
+- Has `Position` and `Orientation`
+- Executes instruction sequences
+- Validates moves against `Grid`
+- Fully unit tested
+### ✔️ `Instruction`
+- Enum for `L`, `R`, `M`
+- Parses from characters
+- Fully unit tested
+### ✔️ `InstructionSequence`
+- Parses and validates instruction strings
+- Provides iterable instructions
+- Fully unit tested
+### ✔️ `Navigator`
+- Orchestrates robot movement on grid
+- Handles out-of-bounds and collisions
+- Fully unit tested
+### ✔️ `OutOfBoundsPolicy`
+- Strategy for handling out-of-bounds moves
+- Currently ignores invalid moves
+- Easily extensible for other policies
+- Fully unit tested
+### ✔️ `DomainException`
+- Domain violation error type
+- Thrown on invalid state or business rules
+- Mapped to HTTP 422 in API layer
+- Verified via behavioral tests
+### ✔️ `Occupancy`
+- Tracks occupied positions during multi-robot execution
+- Implementation: SetOccupancy
+- Prevents two robots sharing a tile
+- Fully unit tested
+---
+## Domain relationship Diagram
+
+┌────────────┐        ┌──────────────┐
+│  Grid      │        │ Orientation  │
+└─────┬──────┘        └──────┬───────┘
+│ inside()              │ dx, dy
+│                       │ turnLeft/right
+▼                       ▼
+┌────────────┐        ┌──────────────┐
+│ Position   │◄───────┤ Instruction  │
+└────┬───────┘        └──────────────┘
+│ next(pos, ori)       ▲
+│                      │ parse
+▼                      │
+┌────────────┐        ┌──────────────┐
+│  Robot     │◄───────┤ InstructionSeq
+└────┬───────┘        └──────────────┘
+│ move/peek/turn
+▼
+┌────────────┐
+│ Navigator  │───> applies policies
+└────┬───────┘
+│ uses
+▼
+┌──────────────┐  ┌────────────────┐
+│OutOfBoundsPol│  │CollisionPolicy │
+└──────────────┘  └────────────────┘
+▲                 ▲
+│                 │
+Ignore / Throw     Wait / Ignore / Throw
+
+┌──────────────┐
+│  Occupancy   │ keeps visited positions
+└──────────────┘
 
 ---
 
@@ -196,7 +268,7 @@ End-to-end tests | ✅ Done
 ## 🧱 Proyect Structure
 
 src/main/java/com/example/robot
-├── domain/ # Modelo puro de dominio (sin Spring)
+├── domain/ # Domain model (No spring dependencies)
 │ ├── Robot.java
 │ ├── Position.java
 │ ├── Orientation.java
@@ -207,23 +279,22 @@ src/main/java/com/example/robot
 │ ├── OutOfBoundsPolicy.java
 │ └── exception/DomainException.java
 │
-├── application/ # Casos de uso (sin framework)
+├── application/ # Use cases (No framework)
 │ ├── port/in/ProcessScenarioUseCase.java
 │ ├── port/in/command/.java
 │ ├── port/in/result/.java
 │ └── service/RobotScenarioService.java
 │
-└── infrastructure/ # Adaptadores (Spring)
+└── infrastructure/ # Adapters (Spring, REST, Parsing)
 ├── controller/RobotController.java
-├── controller/ApiExceptionHandler.java # Manejo global de errores
-├── parser/RawScenarioParser.java # Formato texto plano
+├── controller/ApiExceptionHandler.java # Global error handling
+├── parser/RawScenarioParser.java # Plain text input parser
 ├── dto/*.java
-└── config/ApplicationWiring.java # Inyección de dependencias
+└── config/ApplicationWiring.java # Dependency injection
 
 
-✅ Dominio sin dependencias  
-✅ Aplicación sin Spring  
-✅ Infraestructura como capa externa
+✅ No dependencies from domain/application to Spring 
+✅ Infrastructure depends on domain/application
 
 ---
 
@@ -246,13 +317,19 @@ Content-Type: application/json
 ```
 ### 🔷 Ejecutar con RAW
 POST /api/v1/robots/execute-raw
+
 Content-Type: text/plain
 #### Body
 5 5
+
 1 2 N
+
 LMLMLMLMM
+
 3 3 E
+
 MMRMMRMRRM
+
 
 ### 🧪 Ejecutar Tests
 ./mvnw test

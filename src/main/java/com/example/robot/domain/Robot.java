@@ -4,8 +4,27 @@ package com.example.robot.domain;
 import java.util.Objects;
 
 /**
- * Aggregate root holding state (position, orientation) and atomic movement operations.
- * Does not interpret instruction strings: orchestration lives in Navigator.
+ * Represents the robot aggregate root in the domain model.
+ *
+ * <p>
+ * This type owns the robot's mutable state (position and orientation)
+ * and exposes atomic domain behaviors such as turning and advancing.
+ * It deliberately does <strong>not</strong> parse or interpret instruction strings;
+ * orchestration and policies live in {@code Navigator}.
+ * </p>
+ *
+ * <h2>DDD context</h2>
+ * <ul>
+ *   <li>Aggregate Root controlling robot state and invariants</li>
+ *   <li>Enforces valid initial state (inside grid)</li>
+ *   <li>Delegates navigation rules to {@code Navigator}</li>
+ *   <li>Works alongside immutable Value Objects like {@code Position}</li>
+ * </ul>
+ *
+ * <p>
+ * Mutability here is intentional and controlled: aggregate roots in DDD
+ * may evolve over time to reflect actions within the domain.
+ * </p>
  */
 public final class Robot {
 
