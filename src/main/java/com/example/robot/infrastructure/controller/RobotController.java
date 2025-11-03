@@ -34,11 +34,29 @@ public class RobotController {
     public ResponseEntity<ScenarioResponse> executeRaw(@RequestBody String raw) {
         var cmd = RawScenarioParser.parse(raw);
         var result = useCase.process(cmd);
+
         var response = new ScenarioResponse(
                 result.finals().stream()
                         .map(f -> new FinalStateResponse(f.x(), f.y(), f.orientation()))
                         .toList()
         );
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping(value = "/execute-raw-plain", consumes = "text/plain", produces = "text/plain")
+    public String executeRawPlain(@RequestBody String raw) {
+        var cmd = RawScenarioParser.parse(raw);
+        var result = useCase.process(cmd);
+
+        StringBuilder sb = new StringBuilder();
+        result.finals().forEach(f ->
+                sb.append(f.x())
+                        .append(" ")
+                        .append(f.y())
+                        .append(" ")
+                        .append(f.orientation())
+                        .append("\n")
+        );
+        return sb.toString().trim();
     }
 }
