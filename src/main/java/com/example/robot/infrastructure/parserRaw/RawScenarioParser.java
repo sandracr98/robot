@@ -8,6 +8,7 @@ import com.example.robot.application.port.in.ScenarioCommand;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Parser converting a raw text scenario into a ScenarioCommand. */
 public final class RawScenarioParser {
 
     private RawScenarioParser() { }

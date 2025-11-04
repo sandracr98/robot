@@ -22,7 +22,7 @@ This repository is used as a **learning and clean-architecture practice project*
 - If a robot attempts to move out of bounds, the movement is ignored.
 - Collision policy (extra funcionality): robots cannot occupy the same position. Attempts to move into an occupied cell are detects this potential collision and treats the cell as an obstacle.
   In such cases, the movement for that step is ignored. This prevents overlapping positions and ensures consistent simulation behavior.
-
+- This project takes between 6-8 hours to develop, focusing on clean code, architecture, and testing.
 ---
 
 
